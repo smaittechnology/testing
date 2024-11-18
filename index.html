@@ -1,139 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feedback Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback Form</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f3f4f6;
       margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
+      padding: 20px;
     }
 
     .feedback-container {
       max-width: 500px;
-      margin: 50px auto;
+      margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-      color: #4a4a4a;
-    }
-
-    p {
-      color: #7a7a7a;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
+      text-align: center;
+      color: #333;
     }
 
     label {
-      margin-bottom: 5px;
-      color: #555;
-      text-align: left;
+      display: block;
+      margin: 10px 0 5px;
     }
 
     input,
     textarea,
     select,
     button {
-      margin-bottom: 15px;
+      width: 100%;
       padding: 10px;
+      margin-bottom: 15px;
       border: 1px solid #ddd;
       border-radius: 4px;
-      font-size: 1rem;
-      width: 100%;
     }
 
     button {
-      background-color: #4caf50;
+      background: #4caf50;
       color: white;
       border: none;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #45a049;
+      background: #45a049;
     }
 
-    textarea {
-      resize: none;
-      height: 100px;
+    .success-message,
+    .error-message {
+      display: none;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .success-message {
+      color: green;
+    }
+
+    .error-message {
+      color: red;
     }
   </style>
 </head>
 <body>
   <div class="feedback-container">
-    <h1>Feedback for Ludo Master</h1>
-    <p>Your Thoughts Shape the Future of Fun!</p>
+    <h1>Feedback Form</h1>
+    <div class="success-message" id="successMessage">Feedback sent successfully!</div>
+    <div class="error-message" id="errorMessage">Failed to send feedback. Please try again.</div>
     <form id="feedbackForm">
-      <label for="name">Your name</label>
-      <input type="text" id="name" name="name" placeholder="Enter your name" required />
+      <label for="name">Your Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required />
 
-      <label for="email">Your email</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      <label for="email">Your Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
 
       <label for="subject">Subject</label>
-      <input type="text" id="subject" name="subject" value="Ludo Master Feedback" readonly />
+      <input type="text" id="subject" placeholder="Enter subject" value="Ludo Master Feedback" />
 
       <label for="type">Feedback Type</label>
-      <select id="type" name="type" required>
-        <option value="" disabled selected>Select a type</option>
+      <select id="type" required>
+        <option value="" disabled selected>Select feedback type</option>
         <option value="Bug Report">Bug Report</option>
         <option value="Feature Request">Feature Request</option>
         <option value="General Feedback">General Feedback</option>
       </select>
 
       <label for="message">Your Feedback</label>
-      <textarea id="message" name="message" placeholder="Write your feedback here..." required></textarea>
+      <textarea id="message" placeholder="Write your feedback" required></textarea>
 
-      <button type="submit">Send Feedback</button>
+      <button type="submit">Submit</button>
     </form>
   </div>
 
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
-    (function () {
-      emailjs.init("your_user_id"); // Replace with your EmailJS User ID
-    })();
-
-    document.getElementById("feedbackForm").addEventListener("submit", function (event) {
+    document.getElementById("feedbackForm").addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
+      const subject = document.getElementById("subject").value;
       const type = document.getElementById("type").value;
       const message = document.getElementById("message").value;
 
-      const templateParams = {
-        to_email: "santosh.ad215@gmail.com", // The recipient's email address
-        name,
-        email,
-        subject: "Ludo Master Feedback",
-        type,
-        message,
-      };
-
-      emailjs
-        .send("your_service_id", "your_template_id", templateParams)
-        .then(() => {
-          alert("Feedback sent successfully!");
-          document.getElementById("feedbackForm").reset();
-        })
-        .catch((error) => {
-          console.error("Failed to send feedback:", error);
-          alert("Failed to send feedback. Please try again.");
+      try {
+        const response = await fetch("http://localhost:3000/send-feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, subject, type, message }),
         });
+
+        if (response.ok) {
+          document.getElementById("successMessage").style.display = "block";
+          document.getElementById("errorMessage").style.display = "none";
+          document.getElementById("feedbackForm").reset();
+        } else {
+          document.getElementById("errorMessage").style.display = "block";
+          document.getElementById("successMessage").style.display = "none";
+        }
+      } catch (error) {
+        document.getElementById("errorMessage").style.display = "block";
+        document.getElementById("successMessage").style.display = "none";
+      }
     });
   </script>
 </body>
