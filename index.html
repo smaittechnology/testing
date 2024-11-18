@@ -101,7 +101,12 @@
     </form>
   </div>
 
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <script>
+    (function () {
+      emailjs.init("your_user_id"); // Replace with your EmailJS User ID
+    })();
+
     document.getElementById("feedbackForm").addEventListener("submit", function (event) {
       event.preventDefault();
 
@@ -110,35 +115,25 @@
       const type = document.getElementById("type").value;
       const message = document.getElementById("message").value;
 
-      const feedbackData = {
-        service_id: "your_service_id",
-        template_id: "your_template_id",
-        user_id: "your_user_id",
-        template_params: {
-          name,
-          email,
-          subject: "Ludo Feedback",
-          type,
-          message,
-        },
+      const templateParams = {
+        to_email: "santosh.ad215@gmail.com", // The recipient's email address
+        name,
+        email,
+        subject: "Ludo Master Feedback",
+        type,
+        message,
       };
 
-      fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(feedbackData),
-      })
-        .then((response) => {
-          if (response.ok) {
-            alert("Feedback sent successfully!");
-            document.getElementById("feedbackForm").reset();
-          } else {
-            alert("Failed to send feedback. Please try again.");
-          }
+      emailjs
+        .send("your_service_id", "your_template_id", templateParams)
+        .then(() => {
+          alert("Feedback sent successfully!");
+          document.getElementById("feedbackForm").reset();
         })
-        .catch(() => alert("Error occurred. Please try again later."));
+        .catch((error) => {
+          console.error("Failed to send feedback:", error);
+          alert("Failed to send feedback. Please try again.");
+        });
     });
   </script>
 </body>
